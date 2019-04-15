@@ -141,6 +141,10 @@ int main()
             shaders[i].setVec3("lightPos",lightPos);
             shaders[i].setVec3("viewPos",camera.Position);
 
+            shaders[i].setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+            shaders[i].setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+            shaders[i].setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+            shaders[i].setFloat("material.shininess",32.0f);
           }
           shaders[i].setMat4("view",view);
           shaders[i].setMat4("projection",projection);
