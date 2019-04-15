@@ -1,4 +1,5 @@
 #version 330 core
+out vec4 fragColor;
 
 struct Material {
 	vec3 ambient;
@@ -14,25 +15,19 @@ struct Light {
 	vec3 specular;
 };
 
-uniform Material material;
-uniform Material light;
-
 in vec3 fragNormal;
 in vec3 fragPos;
 
-out vec4 fragColor;
-
-uniform vec3 objColor;
-uniform vec3 lightColor;
-uniform vec3 lightPos;
 uniform vec3 viewPos;
+uniform Material material;
+uniform Light light;
 
 void main()
 {
 	vec3 ambient = light.ambient*material.ambient;
 
 	vec3 norm=normalize(fragNormal);
-	vec3 lightDir=normalize(lightPos-fragPos);
+	vec3 lightDir=normalize(light.position-fragPos);
 	float diff=max(dot(norm,lightDir),0.0f);
 	vec3 diffuse=light.diffuse*(diff*material.diffuse);
 

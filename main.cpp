@@ -123,8 +123,14 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
         //lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
-        float tmp=glfwGetTime();
-        lightPos=glm::vec3(3*cos(tmp),0.0f,3*sin(tmp));
+        //float tmp=glfwGetTime();
+        //lightPos=glm::vec3(3*cos(tmp),0.0f,3*sin(tmp));
+        glm::vec3 lightColor;
+        lightColor.x = sin(glfwGetTime() * 2.0f);
+        lightColor.y = sin(glfwGetTime() * 0.7f);
+        lightColor.z = sin(glfwGetTime() * 1.3f);
+        glm::vec3 diffuse = lightColor*glm::vec3(0.5f); // decrease the influence
+        glm::vec3 ambient = lightColor* glm::vec3(0.2f); // low influence
 
         for (int i=0; i<2; i++) {
           shaders[i].use();
@@ -136,18 +142,17 @@ int main()
             model=glm::scale(model,glm::vec3(0.2f));
           } else {
             //model=glm::rotate(model, (GLfloat)(glm::radians(glfwGetTime()*10.0f)), glm::vec3(1.0f, 0.0f, 0.0f));
-            shaders[i].setVec3("objColor",1.0f, 0.5f, 0.31f);
-            shaders[i].setVec3("lightColor",1.0f, 1.0f, 1.0f);
-            shaders[i].setVec3("lightPos",lightPos);
             shaders[i].setVec3("viewPos",camera.Position);
 
             shaders[i].setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
             shaders[i].setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
             shaders[i].setVec3("material.specular", 0.5f, 0.5f, 0.5f);
             shaders[i].setFloat("material.shininess",32.0f);
-            shaders[i].setVec3("light.ambient",0.2f, 0.2f, 0.2f);
-            shaders[i].setVec3("light.diffuse",0.5f, 0.5f, 0.5f);
+
+            shaders[i].setVec3("light.ambient",ambient);
+            shaders[i].setVec3("light.diffuse",diffuse);
             shaders[i].setVec3("light.specular",1.0f, 1.0f, 1.0f);
+            shaders[i].setVec3("light.position",lightPos);
           }
           shaders[i].setMat4("view",view);
           shaders[i].setMat4("projection",projection);
