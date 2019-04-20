@@ -1,3 +1,2 @@
 bin: main.cpp
-	g++ -std=c++11  main.cpp glad.c  -o bin -Wall  -lglfw3 -lpthread -lGLEW -lGLU -lGL -lrt  -lXrandr -lXxf86vm -lXi -lXinerama -lX11 -lXcursor -ldl -lSOIL
-
+	g++ -std=c++11  main.cpp glad.c  -o bin -Wall  -lglfw3 -lpthread -lGLEW -lGLU -lGL -lrt  -lXrandr -lXxf86vm -lXi -lXinerama -lX11 -lXcursor -ldl -lSOIL -lassimp
