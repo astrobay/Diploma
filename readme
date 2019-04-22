@@ -1,3 +1,9 @@
 git commit -m "Initial Commit" -a
 git push origin master
-git log 
+git log
+Для отделения ветки с какого-либо коммита
+git branch <nameBranch> <номер коммита>
+Для отката к начальному состоянию ветки и переключению на эту ветку
+git checkout <nameBranch>
+Для отката к любому коммиту
+git checkout <номер коммита(первые буквы из git log)>
