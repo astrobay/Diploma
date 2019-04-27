@@ -1,16 +1,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include "include/shader.h"
 #include "include/camera.h"
 #include "include/model.h"
-
 #include <iostream>
+//***********************
+#include "include/sh.h"
+#include "include/sample.h"
+#include "include/genSamples.h"
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -29,6 +31,7 @@ float lastFrame = 0.0f;
 
 int main()
 {
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -189,8 +192,29 @@ int main()
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
 
-    // render loop
-    // -----------
+//*****************************************************************************
+const int sqrtNumSamples=100;
+const int numSamples=sqrtNumSamples*sqrtNumSamples;
+const int numBands=6;
+Sample * samples=NULL;
+samples=new Sample[numSamples];
+if(GenerateSamples(sqrtNumSamples, numBands, samples)) {
+  std::cout << "YES";
+} else {
+  std::cout << "NO..";
+  return -1;
+}
+for (int i=0; i<numSamples; i++) {
+  std::cout << "Sample= " << i << "\n";
+  std::cout << "koeffs= ";
+  for (int j=0; j<numBands*numBands; j++) {
+    std::cout << " j= " << j << " k= " << samples[i].shValues[j];
+  }
+  std::cout << "\n";
+}
+//*****************************************************************************
+
+
     while (!glfwWindowShouldClose(window))
     {
         // per-frame time logic
@@ -253,6 +277,7 @@ int main()
     glDeleteBuffers(1, &skyboxVAO);
 
     glfwTerminate();
+
     return 0;
 }
 
