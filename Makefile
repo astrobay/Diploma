@@ -1,2 +1,2 @@
 bin: main.cpp
-	g++ -std=c++11  main.cpp glad.c sh.cpp genSamples.cpp  -o bin -Wall  -lglfw3 -lpthread -lGLEW -lGLU -lGL -lrt  -lXrandr -lXxf86vm -lXi -lXinerama -lX11 -lXcursor -ldl -lSOIL -lassimp
+	g++ -std=c++11  main.cpp glad.c sh.cpp genSamples.cpp   -o bin -Wall  -lglfw3 -lpthread -lGLEW -lGLU -lGL -lrt  -lXrandr -lXxf86vm -lXi -lXinerama -lX11 -lXcursor -ldl -lSOIL -lassimp

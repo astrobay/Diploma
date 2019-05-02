@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
+#include <stb/stb_image_write.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -8,16 +9,21 @@
 #include "include/camera.h"
 #include "include/model.h"
 #include <iostream>
+#include <cmath>
 //***********************
 #include "include/sh.h"
 #include "include/sample.h"
 #include "include/genSamples.h"
+
+//#include "include/getCoordfromCubemap.h";
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+void get_from_cubemap(Sample *samples, int samplesN, vector<std::string> faces );
+
 unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(vector<std::string> faces);
 const unsigned int SCR_WIDTH = 1280;
@@ -28,6 +34,7 @@ float lastY = (float)SCR_HEIGHT / 2.0;
 bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
 
 int main()
 {
@@ -198,20 +205,8 @@ const int numSamples=sqrtNumSamples*sqrtNumSamples;
 const int numBands=6;
 Sample * samples=NULL;
 samples=new Sample[numSamples];
-if(GenerateSamples(sqrtNumSamples, numBands, samples)) {
-  std::cout << "YES";
-} else {
-  std::cout << "NO..";
-  return -1;
-}
-for (int i=0; i<numSamples; i++) {
-  std::cout << "Sample= " << i << "\n";
-  std::cout << "koeffs= ";
-  for (int j=0; j<numBands*numBands; j++) {
-    std::cout << " j= " << j << " k= " << samples[i].shValues[j];
-  }
-  std::cout << "\n";
-}
+GenerateSamples(sqrtNumSamples, numBands, samples);
+get_from_cubemap(samples, numSamples, faces);
 //*****************************************************************************
 
 
@@ -411,3 +406,67 @@ unsigned int loadCubemap(vector<std::string> faces)
 
     return textureID;
 }
+
+void get_vec_from_byte(unsigned char *facePointer, int width, int height,glm::vec3 *face)
+{
+  for (int i=0; i<height; i++) {
+    for (int j=0; j<width; j+=3) {
+      face[i*width+j].x=facePointer[i*width+j];
+      face[i*width+j].y=facePointer[i*width+j+1];
+      face[i*width+j].z=facePointer[i*width+j+2];
+    }
+  }
+}
+
+void get_texel(float s, float t)
+{
+  
+}
+
+void get_from_cubemap(Sample *samples, int samplesN, vector <std::string> faces )
+{
+  //store the faces
+  // order:  +X (right) 0   -X (left) 1
+  // +Y (top) 2  -Y (bottom) 3
+  // +Z (front) 4  -Z (back) 5
+
+
+
+
+  for (int i=0; i<samplesN; i++) {
+    float x=samples[i].dir.x;
+    float y=samples[i].dir.y;
+	  float z=samples[i].dir.z;
+    float max=std::max(abs(x),std::max(abs(y),abs(z)));
+    float xx=x/max;
+    float yy=y/max;
+    float zz=z/max;
+    switch(xx) {
+      case 1:
+      get_texel(0.5*(-z+1),0.5*(-y+1));
+        break;
+      case -1:
+      get_texel(0.5*(z+1),0.5*(-y+1));
+        break;
+    }
+    switch(yy) {
+      case 1:
+      get_texel(0.5*(x+1),0.5*(z+1));
+        break;
+      case -1:
+      get_texel(0.5*(x+1),0.5*(-z+1));
+        break;
+    }
+    switch(zz) {
+      case 1:
+      get_texel(0.5*(x+1),0.5*(-y+1));
+        break;
+      case -1:
+      get_texel(0.5*(-x+1),0.5*(-y+1));
+        break;
+    }
+ }
+    //free memory
+
+}
+  //get coords from face
