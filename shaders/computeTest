@@ -1,0 +1,24 @@
+#version 430
+struct Sample {
+  vec4 dir;
+  float shValues[16];
+};
+
+layout (std430, binding = 0) buffer buf
+{
+  Sample samples[];
+};
+
+layout (local_size_x = 1000, local_size_y = 1, local_size_z = 1) in;
+
+uniform samplerCube skybox;
+
+void main ()
+{
+  uint idx=gl_GlobalInvocationID.x;
+  vec3 result[16];
+  vec3 light=textureLod(skybox,samples[idx].dir.xyz,0).rgb;
+  for (int i=0; i<16; i++) {
+    result[i]=samples[idx].shValues[i]*light;
+  }
+}

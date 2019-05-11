@@ -1,5 +1,4 @@
 #include <iostream>
-#include "include/sample.h"
 #include "include/genSamples.h"
 #include "include/sh.h"
 
