@@ -9,6 +9,11 @@ layout (std430, binding = 0) buffer buf
   Sample samples[];
 };
 
+layout (std430, binding = 1) buffer res
+{
+  vec4 result[];
+};
+
 layout (local_size_x = 1000, local_size_y = 1, local_size_z = 1) in;
 
 uniform samplerCube skybox;
@@ -16,9 +21,9 @@ uniform samplerCube skybox;
 void main ()
 {
   uint idx=gl_GlobalInvocationID.x;
-  vec3 result[16];
-  vec3 light=textureLod(skybox,samples[idx].dir.xyz,0).rgb;
+  uint idxRes=gl_GlobalInvocationID.x*16;
+  vec4 light=vec4(texture(skybox,samples[idx].dir.xyz).rgb,0.0);
   for (int i=0; i<16; i++) {
-    result[i]=samples[idx].shValues[i]*light;
+    result[idxRes+i]=samples[idx].shValues[i]*light;
   }
 }

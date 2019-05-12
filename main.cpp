@@ -70,11 +70,19 @@ int main()
   const int numSamples=sqrtNumSamples*sqrtNumSamples;
   const int numBands=4;
   const int numFunctions=numBands*numBands;
+  const int resSize=numFunctions*numSamples;
+  vec4 result[resSize];
   Sample *samples=NULL;
   samples=new Sample[numSamples];
   structSample structSamples[numSamples];
   GenerateSamples(sqrtNumSamples, numBands, samples);
   copy_from_class_to_struct(structSamples,samples,numSamples);
+  for (int i=0; i<resSize; i++) {
+    result[i].x=5;
+    result[i].y=5;
+    result[i].z=5;
+    result[i].w=5;
+  }
   /*for (int i=0; i<numSamples; i++) {
     cout << " class dir: " << samples[i].dir.x << samples[i].dir.y
       << samples[i].dir.z << " str dir: " << structSamples[i].dir.x
@@ -85,28 +93,74 @@ int main()
     }
       cout << "\n";
   } */
-  /*for (int i=0; i<numSamples; i++) {
+/*  for (int i=0; i<numSamples; i++) {
     cout << structSamples[i].dir.x << " "<< structSamples[i].dir.y << " " << structSamples[i].dir.z << "\n";
     cout << structSamples[i].shValues[1] << "\n";
   }
   cout << "\n"; */
-
+/*  for (int i=0; i<numFunctions; i++) {
+    cout << structSamples[0].shValues[i] << " ";
+  }
+  cout << "\n";
+  cout << "\n"; */
 //Create compute shader
   Shader compute(NULL,NULL,"shaders/computeTest");
   compute.use();
   compute.setInt("skybox",0);
-  unsigned int ssbo;
-  glGenBuffers(1, &ssbo);
-  glBindBuffer(GL_SHADER_STORAGE_BUFFER,ssbo);
+  unsigned int ssboInput, ssboRes;
+  glGenBuffers(1, &ssboInput);
+  glGenBuffers(1, &ssboRes);
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER,ssboInput);
   glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(structSamples), &structSamples[0], GL_STATIC_DRAW);
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER,0,ssbo);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER,0,ssboInput);
+  //*************
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER,ssboRes);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(result), result, GL_STATIC_DRAW);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER,1,ssboRes);
+
   glDispatchCompute(10,1,1);
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-  structSample *p;
-  p = (structSample *) glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-  /*for (int i=0; i<numSamples; i++) {
-    cout << p[i].dir.x << " "<< p[i].dir.y << " "<<p[i].dir.z << "\n";
-    cout << p[i].shValues[1] << "\n";
+  vec4 *res;
+  vec4 koeffs[numFunctions];
+  for (int i=0; i<numFunctions; i++) {
+    koeffs[i].x=0;
+    koeffs[i].y=0;
+    koeffs[i].z=0;
+    koeffs[i].w=0;
+  }
+  res = (vec4 *) glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+
+  for (int i=0; i<numSamples; i++) {
+    for (int j=0; j<numFunctions; j++) {
+      koeffs[j]+=res[i*numFunctions+j];
+      cout << res[i*numFunctions+j].x << " | " << res[i*numFunctions+j].y << " | " << res[i*numFunctions+j].z << "\n";
+    }
+    cout << "\n";
+  }
+  float weight=4*M_PI/numSamples;
+  for (int i=0; i<numFunctions; i++) {
+    koeffs[i]*=weight;
+  }
+    cout << "\n";
+      cout << "\n";
+  for (int i=0; i<numFunctions; i++) {
+    cout << koeffs[i].x << " | " << koeffs[i].y << " | " << koeffs[i].z << "\n";
+  }
+  cout << "\n";
+  /*structSample *in;
+  in = (structSample *) glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+  for (int i=0; i<numFunctions; i++) {
+    cout << in[0].shValues[i] << " ";
+  }
+  cout << "\n";
+  cout << "\n";
+  for (int i=0; i<numFunctions; i++) {
+    cout << res[i].x << " ";
+  }
+  cout << "\n"; */
+/*  for (int i=0; i<numFunctions; i++) {
+    cout << p[i].x << " "<< p[i].y << " "<<p[i].z << "\n";
+    //cout << p[i].shValues[1] << "\n";
   } */
 //*****************************************************************************
 
