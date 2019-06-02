@@ -5,6 +5,7 @@
 
 bool GenerateSamples(int sqrtNumSamples, int numBands, Sample * samples)
 {
+  srand(time(NULL));
   int numSamples=sqrtNumSamples*sqrtNumSamples;
   int numFunctions=numBands*numBands;
   int index=0;
